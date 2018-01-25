@@ -48,7 +48,16 @@
     <UseVSHostingProcess>true</UseVSHostingProcess>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>FluentStrongName.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ControlzEx">
+      <HintPath>..\..\ControlzEx\src\bin\Release\NET45\ControlzEx.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -230,6 +239,7 @@
     <None Include="Documents\Features.xlsx" />
     <None Include="Documents\Fluent Ribbon Control Suite Walkthrough.docx" />
     <Resource Include="Themes\Effects\Grayscale.ps" />
+    <None Include="FluentStrongName.snk" />
     <None Include="paket.references" />
     <None Include="Themes\Accents\GeneratorParameters.json" />
     <None Include="Themes\Effects\Grayscale.fx" />
@@ -606,12 +616,6 @@ SET ERRORLEVEL=%25tmpError%25</PreBuildEvent>
     </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.5'">
       <ItemGroup>
-        <Reference Include="ControlzEx">
-          <HintPath>..\packages\ControlzEx\lib\net45\ControlzEx.dll</HintPath>
-          <Private>True</Private>
-          <SpecificVersion>False</SpecificVersion>
-          <Paket>True</Paket>
-        </Reference>
         <Reference Include="System.Windows.Interactivity">
           <HintPath>..\packages\ControlzEx\lib\net45\System.Windows.Interactivity.dll</HintPath>
           <Private>True</Private>
