@@ -6,7 +6,7 @@ end_of_line = CRLF
 
 [*.{cs,xaml,xml,nuspec,msbuild}]
 indent_style = space
-indent_size = 4
+indent_size = 2
 
 [*.{md,yml}]
 indent_style = space
