@@ -145,16 +145,17 @@ namespace Fluent
         public bool HasOverflowItems
         {
             get { return (bool)this.GetValue(HasOverflowItemsProperty); }
-            private set { this.SetValue(hasOverflowItemsPropertyKey, value); }
+            private set { this.SetValue(HasOverflowItemsPropertyKey, value); }
         }
 
-        private static readonly DependencyPropertyKey hasOverflowItemsPropertyKey =
+        // ReSharper disable once InconsistentNaming
+        private static readonly DependencyPropertyKey HasOverflowItemsPropertyKey =
             DependencyProperty.RegisterReadOnly(nameof(HasOverflowItems), typeof(bool), typeof(QuickAccessToolBar), new PropertyMetadata(BooleanBoxes.FalseBox));
 
         /// <summary>
         /// Using a DependencyProperty as the backing store for HasOverflowItems.  This enables animation, styling, binding, etc...
         /// </summary>
-        public static readonly DependencyProperty HasOverflowItemsProperty = hasOverflowItemsPropertyKey.DependencyProperty;
+        public static readonly DependencyProperty HasOverflowItemsProperty = HasOverflowItemsPropertyKey.DependencyProperty;
 
         #endregion
 
@@ -271,9 +272,7 @@ namespace Fluent
 
         #region LogicalChildren
 
-        /// <summary>
-        /// Gets an enumerator to the logical child elements
-        /// </summary>
+        /// <inheritdoc />
         protected override IEnumerator LogicalChildren
         {
             get
@@ -338,10 +337,7 @@ namespace Fluent
 
         #region Override
 
-        /// <summary>
-        /// When overridden in a derived class, is invoked whenever application code or
-        /// internal processes call System.Windows.FrameworkElement.ApplyTemplate().
-        /// </summary>
+        /// <inheritdoc />
         public override void OnApplyTemplate()
         {
             if (this.showAbove != null)
@@ -469,11 +465,7 @@ namespace Fluent
             this.ShowAboveRibbon = true;
         }
 
-        /// <summary>
-        /// Called to remeasure a control.
-        /// </summary>
-        /// <returns>The size of the control, up to the maximum specified by constraint</returns>
-        /// <param name="constraint">The maximum size that the method can return</param>
+        /// <inheritdoc />
         protected override Size MeasureOverride(Size constraint)
         {
             if ((this.cachedConstraint == constraint)
@@ -585,9 +577,9 @@ namespace Fluent
         /// <see cref="DependencyProperty"/> for <see cref="UpdateKeyTipsAction"/>.
         /// </summary>
         public static readonly DependencyProperty UpdateKeyTipsActionProperty =
-            DependencyProperty.Register(nameof(UpdateKeyTipsAction), typeof(Action<QuickAccessToolBar>), typeof(QuickAccessToolBar), new PropertyMetadata(OnUpdateKeyTipsChanged));
+            DependencyProperty.Register(nameof(UpdateKeyTipsAction), typeof(Action<QuickAccessToolBar>), typeof(QuickAccessToolBar), new PropertyMetadata(OnUpdateKeyTipsActionChanged));
 
-        private static void OnUpdateKeyTipsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnUpdateKeyTipsActionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var quickAccessToolBar = (QuickAccessToolBar)d;
             quickAccessToolBar.UpdateKeyTips();

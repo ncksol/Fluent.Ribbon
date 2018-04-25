@@ -43,8 +43,6 @@ namespace Fluent
         // Is visual currently snapped
         private bool isSnapped;
 
-        //private GalleryPanel galleryPanel;
-
         private ScrollViewer scrollViewer;
 
         private bool canSizeY;
@@ -55,9 +53,7 @@ namespace Fluent
 
         #region Size
 
-        /// <summary>
-        ///     Gets or sets Size for the element.
-        /// </summary>
+        /// <inheritdoc />
         public RibbonControlSize Size
         {
             get { return (RibbonControlSize)this.GetValue(SizeProperty); }
@@ -74,9 +70,7 @@ namespace Fluent
 
         #region SizeDefinition
 
-        /// <summary>
-        ///     Gets or sets SizeDefinition for element.
-        /// </summary>
+        /// <inheritdoc />
         public RibbonControlSizeDefinition SizeDefinition
         {
             get { return (RibbonControlSizeDefinition)this.GetValue(SizeDefinitionProperty); }
@@ -93,9 +87,7 @@ namespace Fluent
 
         #region KeyTip
 
-        /// <summary>
-        ///     Gets or sets KeyTip for element.
-        /// </summary>
+        /// <inheritdoc />
         public string KeyTip
         {
             get { return (string)this.GetValue(KeyTipProperty); }
@@ -110,21 +102,15 @@ namespace Fluent
 
         #endregion
 
-        /// <summary>
-        ///     Gets drop down popup
-        /// </summary>
+        /// <inheritdoc />
         public Popup DropDownPopup { get; private set; }
 
-        /// <summary>
-        ///     Gets a value indicating whether context menu is opened
-        /// </summary>
+        /// <inheritdoc />
         public bool IsContextMenuOpened { get; set; }
 
         #region Header
 
-        /// <summary>
-        ///     Gets or sets element Text
-        /// </summary>
+        /// <inheritdoc />
         public object Header
         {
             get { return (string)this.GetValue(HeaderProperty); }
@@ -141,9 +127,7 @@ namespace Fluent
 
         #region Icon
 
-        /// <summary>
-        ///     Gets or sets Icon for the element
-        /// </summary>
+        /// <inheritdoc />
         public object Icon
         {
             get { return this.GetValue(IconProperty); }
@@ -316,10 +300,10 @@ namespace Fluent
             PopupService.Attach(type);
             ContextMenuService.Attach(type);
             DefaultStyleKeyProperty.OverrideMetadata(type, new FrameworkPropertyMetadata(type));
-            SelectedItemProperty.OverrideMetadata(type, new FrameworkPropertyMetadata(OnSelectionItemChanged, CoerceSelectedItem));
+            SelectedItemProperty.OverrideMetadata(type, new FrameworkPropertyMetadata(OnSelectedItemChanged, CoerceSelectedItem));
         }
 
-        private static void OnSelectionItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnSelectedItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var combo = (ComboBox)d;
             if (combo.isQuickAccessOpened == false
@@ -354,12 +338,7 @@ namespace Fluent
 
         #region QuickAccess
 
-        /// <summary>
-        ///     Gets control which represents shortcut item.
-        ///     This item MUST be syncronized with the original
-        ///     and send command to original one control.
-        /// </summary>
-        /// <returns>Control which represents shortcut item</returns>
+        /// <inheritdoc />
         public virtual FrameworkElement CreateQuickAccessItem()
         {
             var combo = new ComboBox();
@@ -522,9 +501,7 @@ namespace Fluent
             this.UpdateQuickAccessCombo();
         }
 
-        /// <summary>
-        ///     Gets or sets whether control can be added to quick access toolbar
-        /// </summary>
+        /// <inheritdoc />
         public bool CanAddToQuickAccessToolBar
         {
             get { return (bool)this.GetValue(CanAddToQuickAccessToolBarProperty); }
@@ -535,16 +512,13 @@ namespace Fluent
         ///     Using a DependencyProperty as the backing store for CanAddToQuickAccessToolBar.  This enables animation, styling,
         ///     binding, etc...
         /// </summary>
-        public static readonly DependencyProperty CanAddToQuickAccessToolBarProperty = RibbonControl.CanAddToQuickAccessToolBarProperty.AddOwner(typeof(ComboBox), new PropertyMetadata(BooleanBoxes.TrueBox, RibbonControl.OnCanAddToQuickAccessToolbarChanged));
+        public static readonly DependencyProperty CanAddToQuickAccessToolBarProperty = RibbonControl.CanAddToQuickAccessToolBarProperty.AddOwner(typeof(ComboBox), new PropertyMetadata(BooleanBoxes.TrueBox, RibbonControl.OnCanAddToQuickAccessToolBarChanged));
 
         #endregion
 
         #region Overrides
 
-        /// <summary>
-        ///     When overridden in a derived class, is invoked whenever application code or internal processes call
-        ///     <see cref="M:System.Windows.FrameworkElement.ApplyTemplate" />.
-        /// </summary>
+        /// <inheritdoc />
         public override void OnApplyTemplate()
         {
             this.DropDownPopup = this.GetTemplateChild("PART_Popup") as Popup;
@@ -594,10 +568,7 @@ namespace Fluent
             base.OnApplyTemplate();
         }
 
-        /// <summary>
-        ///     Reports when a combo box's popup opens.
-        /// </summary>
-        /// <param name="e">The event data for the <see cref="E:System.Windows.Controls.ComboBox.DropDownOpened" /> event.</param>
+        /// <inheritdoc />
         protected override void OnDropDownOpened(EventArgs e)
         {
             base.OnDropDownOpened(e);
@@ -638,10 +609,7 @@ namespace Fluent
             popupChild?.UpdateLayout();
         }
 
-        /// <summary>
-        ///     Reports when a combo box's popup closes.
-        /// </summary>
-        /// <param name="e">The event data for the <see cref="E:System.Windows.Controls.ComboBox.DropDownClosed" /> event.</param>
+        /// <inheritdoc />
         protected override void OnDropDownClosed(EventArgs e)
         {
             base.OnDropDownClosed(e);
@@ -682,13 +650,12 @@ namespace Fluent
             }
         }
 
-        /// <summary>
-        ///     Invoked when a <see cref="E:System.Windows.Input.Keyboard.PreviewKeyDown" /> attached routed event occurs.
-        /// </summary>
-        /// <param name="e">Event data.</param>
+        /// <inheritdoc />
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
-            if (this.IsEditable && ((e.Key == Key.Down) || (e.Key == Key.Up)) && !this.IsDropDownOpen)
+            if (this.IsEditable
+                && ((e.Key == Key.Down) || (e.Key == Key.Up))
+                && !this.IsDropDownOpen)
             {
                 this.IsDropDownOpen = true;
                 e.Handled = true;
@@ -698,10 +665,7 @@ namespace Fluent
             base.OnPreviewKeyDown(e);
         }
 
-        /// <summary>
-        ///     Invoked when a <see cref="E:System.Windows.Input.Keyboard.KeyDown" /> attached routed event occurs.
-        /// </summary>
-        /// <param name="e">Event data.</param>
+        /// <inheritdoc />
         protected override void OnKeyDown(KeyEventArgs e)
         {
             var baseKeyDownCalled = false;

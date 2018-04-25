@@ -3,7 +3,7 @@
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     xmlns:Fluent="clr-namespace:Fluent"
-                    xmlns:Converters="clr-namespace:Fluent.Converters"
+                    xmlns:converters="clr-namespace:Fluent.Converters"
                     mc:Ignorable="d">
 
     <!--Button in Spinner Control Style-->
@@ -83,7 +83,7 @@
                                   Height="16"
                                   VerticalAlignment="Center"
                                   Margin="4,0,0,0"
-                                  Content="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static Converters:StaticConverters.ObjectToImageConverter}}" />
+                                  Content="{converters:ObjectToImageConverter {Binding Icon, RelativeSource={RelativeSource TemplatedParent}}, '16,16'}" />
 
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -118,14 +118,17 @@
                     </Grid.RowDefinitions>
 
                     <TextBox x:Name="PART_TextBox"
-                                BorderThickness="0"
-                                Grid.RowSpan="2"
-                                Grid.Column="0"
-                                Background="{DynamicResource Fluent.Ribbon.Brushes.TextBox.Background}"
-                                Foreground="{TemplateBinding Foreground}"
-                                Padding="2,0,2,0"
-                                Margin="0"
-                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                             Style="{x:Null}"
+                             BorderThickness="0"
+                             Grid.RowSpan="2"
+                             Grid.Column="0"
+                             Background="{DynamicResource Fluent.Ribbon.Brushes.TextBox.Background}"
+                             Foreground="{TemplateBinding Foreground}"
+                             CaretBrush="{DynamicResource Fluent.Ribbon.Brushes.TextBox.CaretBrush}"
+                             SelectionBrush="{DynamicResource Fluent.Ribbon.Brushes.TextBox.SelectionBrush}"
+                             Padding="2,0,2,0"
+                             Margin="0"
+                             VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
                                 
                     <Path Visibility="Collapsed"
                             HorizontalAlignment="Left"

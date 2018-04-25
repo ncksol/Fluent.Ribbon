@@ -3,7 +3,7 @@
                     xmlns:Fluent="clr-namespace:Fluent"
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                    xmlns:Converters="clr-namespace:Fluent.Converters"
+                    xmlns:converters="clr-namespace:Fluent.Converters"
                     mc:Ignorable="d">
     <Style x:Key="RibbonComboButtonStyle"
            TargetType="{x:Type Fluent:ToggleButton}">
@@ -125,7 +125,7 @@
                                   Height="16"
                                   VerticalAlignment="Center"
                                   Margin="3,0,0,0"
-                                  Content="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static Converters:StaticConverters.ObjectToImageConverter}}" />
+                                  Content="{converters:ObjectToImageConverter {Binding Icon, RelativeSource={RelativeSource TemplatedParent}}, '16,16'}" />
 
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -184,17 +184,20 @@
                             Visibility="Collapsed"
                             Width="Auto"
                             Height="Auto" />
-                    <TextBox Focusable="True"
-                                x:Name="PART_EditableTextBox"
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
-                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                TextWrapping="NoWrap"
-                                BorderThickness="0,0,0,0"
-                                IsReadOnly="{TemplateBinding IsReadOnly}"                                 
-                                Background="{DynamicResource Fluent.Ribbon.Brushes.TextBox.Background}"
-                                Foreground="{TemplateBinding Foreground}"
-                                Visibility="Hidden" />
+                    <TextBox x:Name="PART_EditableTextBox"
+                             Focusable="True"                             
+                             Style="{x:Null}"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch"
+                             VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                             TextWrapping="NoWrap"
+                             BorderThickness="0,0,0,0"
+                             IsReadOnly="{TemplateBinding IsReadOnly}"                                 
+                             Background="{DynamicResource Fluent.Ribbon.Brushes.TextBox.Background}"
+                             Foreground="{TemplateBinding Foreground}"
+                             CaretBrush="{DynamicResource Fluent.Ribbon.Brushes.TextBox.CaretBrush}"
+                             SelectionBrush="{DynamicResource Fluent.Ribbon.Brushes.TextBox.SelectionBrush}"
+                             Visibility="Hidden" />
                 </Grid>
             </Border>
             <Popup x:Name="PART_Popup"
@@ -333,7 +336,6 @@
                             BorderThickness="1"
                             CornerRadius="1"
                             Grid.ColumnSpan="1"
-                            d:LayoutOverrides="Width, Height"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Top">
                         <Grid Width="Auto"
@@ -578,6 +580,8 @@
     <Style TargetType="{x:Type Fluent:ComboBox}">
         <Setter Property="Template"
                 Value="{DynamicResource ComboboxControlTemplate}" />
+        <Setter Property="Foreground"
+                Value="{DynamicResource Fluent.Ribbon.Brushes.LabelTextBrush}" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility"
                 Value="Auto" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility"

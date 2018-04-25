@@ -9,6 +9,7 @@ namespace Fluent
     using System.Windows.Media;
     using Fluent.Extensions;
     using Fluent.Helpers;
+    using Fluent.Internal;
     using Fluent.Internal.KnownBoxes;
     using WindowChrome = ControlzEx.Windows.Shell.WindowChrome;
 
@@ -53,10 +54,10 @@ namespace Fluent
         /// Using a DependencyProperty as the backing store for QuickAccessToolBar.  This enables animation, styling, binding, etc...
         /// </summary>
         public static readonly DependencyProperty QuickAccessToolBarProperty =
-            DependencyProperty.Register(nameof(QuickAccessToolBar), typeof(FrameworkElement), typeof(RibbonTitleBar), new PropertyMetadata(OnQuickAccessToolbarChanged));
+            DependencyProperty.Register(nameof(QuickAccessToolBar), typeof(FrameworkElement), typeof(RibbonTitleBar), new PropertyMetadata(OnQuickAccessToolBarChanged));
 
         // Handles QuickAccessToolBar property chages
-        private static void OnQuickAccessToolbarChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnQuickAccessToolBarChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var titleBar = (RibbonTitleBar)d;
             titleBar.ForceMeasureAndArrange();
@@ -287,10 +288,10 @@ namespace Fluent
 
             if (parentUIElement == null)
             {
-                return default(Point);
+                return default;
             }
 
-            return this.TranslatePoint(default(Point), parentUIElement);
+            return this.TranslatePoint(default, parentUIElement);
         }
 
         // Update items size and positions
@@ -309,10 +310,7 @@ namespace Fluent
             {
                 var firstVisibleItem = visibleGroups.First().FirstVisibleItem;
 
-                if (firstVisibleItem?.Parent != null)
-                {
-                    canRibbonTabControlScroll = ((RibbonTabControl)firstVisibleItem.Parent).CanScroll;
-                }
+                canRibbonTabControlScroll = UIHelper.GetParent<RibbonTabControl>(firstVisibleItem)?.CanScroll == true;
             }
 
             if (this.IsCollapsed)

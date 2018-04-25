@@ -2,7 +2,9 @@
 namespace Fluent
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Linq;
     using System.Windows;
     using System.Windows.Input;
     using System.Windows.Interop;
@@ -55,6 +57,19 @@ namespace Fluent
             }
         }
 
+        /// <summary>
+        /// The default keys used to activate key tips.
+        /// </summary>
+        public static IList<Key> DefaultKeyTipKeys => new List<Key>
+                                                      {
+                                                          Key.LeftAlt,
+                                                          Key.RightAlt,
+                                                          Key.F10
+                                                      };
+
+        // List of key tip activation keys
+        public IList<Key> KeyTipKeys { get; } = new List<Key>();
+
         #endregion
 
         #region Initialization
@@ -65,12 +80,7 @@ namespace Fluent
         /// <param name="ribbon">Host element</param>
         public KeyTipService(Ribbon ribbon)
         {
-            if (ribbon == null)
-            {
-                throw new ArgumentNullException(nameof(ribbon));
-            }
-
-            this.ribbon = ribbon;
+            this.ribbon = ribbon ?? throw new ArgumentNullException(nameof(ribbon));
 
             // Initialize timer
             this.timer = new DispatcherTimer(TimeSpan.FromSeconds(0.7), DispatcherPriority.SystemIdle, this.OnDelayedShow, Dispatcher.CurrentDispatcher);
@@ -146,7 +156,7 @@ namespace Fluent
             // We must terminate the keytip's adorner chain if:
             if (msg == (int)WM.NCACTIVATE // mouse clicks in non client area
                 || (msg == (int)WM.ACTIVATE && wParam == IntPtr.Zero) // the window is deactivated
-                                                                           // >= WM_NCLBUTTONDOWN <= WM_NCXBUTTONDBLCLK
+                                                                      // >= WM_NCLBUTTONDOWN <= WM_NCXBUTTONDBLCLK
                 || (msg >= 161 && msg <= 173) // mouse click (non client area)
                 || (msg >= 513 && msg <= 521)) // mouse click
             {
@@ -186,7 +196,7 @@ namespace Fluent
                 return;
             }
 
-            if (IsShowOrHideKey(e))
+            if (this.IsShowOrHideKey(e))
             {
                 if (this.activeAdornerChain == null
                     || this.activeAdornerChain.IsAdornerChainAlive == false
@@ -293,7 +303,7 @@ namespace Fluent
                 return;
             }
 
-            if (IsShowOrHideKey(e))
+            if (this.IsShowOrHideKey(e))
             {
                 this.ClearUserInput();
 
@@ -310,13 +320,21 @@ namespace Fluent
             }
         }
 
-        private static bool IsShowOrHideKey(KeyEventArgs e)
+        private bool IsShowOrHideKey(KeyEventArgs e)
         {
-            return e.Key == Key.System && !Keyboard.IsKeyDown(Key.LeftShift) && !Keyboard.IsKeyDown(Key.RightShift)
-                   && (e.SystemKey == Key.LeftAlt
-                       || e.SystemKey == Key.RightAlt
-                       || e.SystemKey == Key.F10
-                       || e.SystemKey == Key.Space);
+            var realKey = e.Key == Key.System
+                          ? e.SystemKey
+                          : e.Key;
+
+            // Shift + F10 is meant to open the context menu. So we just ignore it.
+            if (realKey == Key.F10
+                && (Keyboard.IsKeyDown(Key.LeftShift)
+                    || Keyboard.IsKeyDown(Key.RightShift)))
+            {
+                return false;
+            }
+
+            return this.KeyTipKeys.Any(x => x == realKey);
         }
 
         private void ClearUserInput()

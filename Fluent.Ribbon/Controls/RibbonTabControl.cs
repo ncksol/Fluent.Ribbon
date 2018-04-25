@@ -11,7 +11,6 @@ namespace Fluent
     using System.Windows.Controls;
     using System.Windows.Controls.Primitives;
     using System.Windows.Input;
-    using System.Windows.Media;
     using ControlzEx.Standard;
     using Fluent.Internal;
     using Fluent.Internal.KnownBoxes;
@@ -77,9 +76,7 @@ namespace Fluent
 
         #endregion
 
-        /// <summary>
-        /// Gets drop down popup
-        /// </summary>
+        /// <inheritdoc />
         public Popup DropDownPopup { get; private set; }
 
         /// <summary>
@@ -87,9 +84,7 @@ namespace Fluent
         /// </summary>
         public ContentPresenter SelectedContentPresenter { get; private set; }
 
-        /// <summary>
-        /// Gets a value indicating whether context menu is opened
-        /// </summary>
+        /// <inheritdoc />
         public bool IsContextMenuOpened { get; set; }
 
         /// <summary>
@@ -129,7 +124,7 @@ namespace Fluent
         /// <summary>
         /// Using a DependencyProperty as the backing store for <see cref="IsMinimized"/>.  This enables animation, styling, binding, etc...
         /// </summary>
-        public static readonly DependencyProperty IsMinimizedProperty = DependencyProperty.Register(nameof(IsMinimized), typeof(bool), typeof(RibbonTabControl), new PropertyMetadata(BooleanBoxes.FalseBox, OnMinimizedChanged));
+        public static readonly DependencyProperty IsMinimizedProperty = DependencyProperty.Register(nameof(IsMinimized), typeof(bool), typeof(RibbonTabControl), new PropertyMetadata(BooleanBoxes.FalseBox, OnIsMinimizedChanged));
 
         /// <summary>
         /// Gets or sets whether ribbon can be minimized
@@ -145,9 +140,7 @@ namespace Fluent
         /// </summary>
         public static readonly DependencyProperty CanMinimizeProperty = DependencyProperty.Register(nameof(CanMinimize), typeof(bool), typeof(RibbonTabControl), new PropertyMetadata(BooleanBoxes.TrueBox));
 
-        /// <summary>
-        /// Gets or sets whether ribbon popup is opened
-        /// </summary>
+        /// <inheritdoc />
         public bool IsDropDownOpen
         {
             get { return (bool)this.GetValue(IsDropDownOpenProperty); }
@@ -322,6 +315,34 @@ namespace Fluent
             DependencyProperty.Register(nameof(ContentGapHeight), typeof(double), typeof(RibbonTabControl), new PropertyMetadata(DefaultContentGapHeight));
 
         /// <summary>
+        /// <see cref="DependencyProperty"/> for <see cref="AreTabHeadersVisible"/>.
+        /// </summary>
+        public static readonly DependencyProperty AreTabHeadersVisibleProperty = DependencyProperty.Register(nameof(AreTabHeadersVisible), typeof(bool), typeof(RibbonTabControl), new PropertyMetadata(BooleanBoxes.TrueBox));
+
+        /// <summary>
+        /// Defines wether tab headers are visible or not.
+        /// </summary>
+        public bool AreTabHeadersVisible
+        {
+            get { return (bool)this.GetValue(AreTabHeadersVisibleProperty); }
+            set { this.SetValue(AreTabHeadersVisibleProperty, value); }
+        }
+
+        /// <summary>
+        /// <see cref="DependencyProperty"/> for <see cref="IsToolBarVisible"/>.
+        /// </summary>
+        public static readonly DependencyProperty IsToolBarVisibleProperty = DependencyProperty.Register(nameof(IsToolBarVisible), typeof(bool), typeof(RibbonTabControl), new PropertyMetadata(BooleanBoxes.TrueBox));
+
+        /// <summary>
+        /// Defines wether tab headers are visible or not.
+        /// </summary>
+        public bool IsToolBarVisible
+        {
+            get { return (bool)this.GetValue(IsToolBarVisibleProperty); }
+            set { this.SetValue(IsToolBarVisibleProperty, value); }
+        }
+
+        /// <summary>
         /// DependencyProperty for <see cref="IsMouseWheelScrollingEnabled"/>
         /// </summary>
         public static readonly DependencyProperty IsMouseWheelScrollingEnabledProperty = DependencyProperty.Register(nameof(IsMouseWheelScrollingEnabled), typeof(bool), typeof(RibbonTabControl), new PropertyMetadata(BooleanBoxes.TrueBox));
@@ -367,41 +388,26 @@ namespace Fluent
 
         #region Overrides
 
-        /// <summary>
-        /// Raises the System.Windows.FrameworkElement.Initialized event.
-        /// This method is invoked whenever System.Windows.
-        /// FrameworkElement.IsInitialized is set to true internally.
-        /// </summary>
-        /// <param name="e">The System.Windows.RoutedEventArgs that contains the event data.</param>
+        /// <inheritdoc />
         protected override void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
             this.ItemContainerGenerator.StatusChanged += this.OnGeneratorStatusChanged;
         }
 
-        /// <summary>
-        /// Creates or identifies the element that is used to display the given item.
-        /// </summary>
-        /// <returns>The element that is used to display the given item.</returns>
+        /// <inheritdoc />
         protected override DependencyObject GetContainerForItemOverride()
         {
             return new RibbonTabItem();
         }
 
-        /// <summary>
-        /// Determines if the specified item is (or is eligible to be) its own container.
-        /// </summary>
-        /// <param name="item">The item to check.</param>
-        /// <returns>true if the item is (or is eligible to be) its own container; otherwise, false.</returns>
+        /// <inheritdoc />
         protected override bool IsItemItsOwnContainerOverride(object item)
         {
             return item is RibbonTabItem;
         }
 
-        /// <summary>
-        /// When overridden in a derived class, is invoked whenever application code or
-        /// internal processes call System.Windows.FrameworkElement.ApplyTemplate().
-        /// </summary>
+        /// <inheritdoc />
         public override void OnApplyTemplate()
         {
             this.SelectedContentPresenter = this.Template.FindName("PART_SelectedContentPresenter", this) as ContentPresenter;
@@ -434,10 +440,7 @@ namespace Fluent
             }
         }
 
-        /// <summary>
-        /// Updates the current selection when an item in the System.Windows.Controls.Primitives.Selector has changed
-        /// </summary>
-        /// <param name="e">The event data.</param>
+        /// <inheritdoc />
         protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
         {
             base.OnItemsChanged(e);
@@ -469,10 +472,7 @@ namespace Fluent
             }
         }
 
-        /// <summary>
-        /// Called when the selection changes.
-        /// </summary>
-        /// <param name="e">The event data.</param>
+        /// <inheritdoc />
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
             this.UpdateSelectedContent();
@@ -510,12 +510,7 @@ namespace Fluent
             base.OnSelectionChanged(e);
         }
 
-        /// <summary>
-        /// Invoked when an unhandled System.Windows.Input.Mouse.PreviewMouseWheel
-        /// attached event reaches an element in its route that is derived from this class.
-        /// Implement this method to add class handling for this event.
-        /// </summary>
-        /// <param name="e">The System.Windows.Input.MouseWheelEventArgs that contains the event data.</param>
+        /// <inheritdoc />
         protected override void OnPreviewMouseWheel(MouseWheelEventArgs e)
         {
             //base.OnPreviewMouseWheel(e);
@@ -526,10 +521,7 @@ namespace Fluent
             }
         }
 
-        /// <summary>
-        /// Invoked when the <see cref="E:System.Windows.UIElement.KeyDown"/> event is received.
-        /// </summary>
-        /// <param name="e">Information about the event.</param>
+        /// <inheritdoc />
         protected override void OnKeyDown(KeyEventArgs e)
         {
             this.OnKeyUp(e);
@@ -625,17 +617,10 @@ namespace Fluent
             var visualItems = new List<RibbonTabItem>();
             var selectedIndex = -1;
 
-#if NET45 || NET462
             var tabs = this.ItemContainerGenerator.Items.OfType<RibbonTabItem>()
                 .Where(x => x.Visibility == Visibility.Visible && x.IsEnabled && (x.IsContextual == false || (x.IsContextual && x.Group.Visibility == Visibility.Visible)))
                 .OrderBy(x => x.IsContextual)
                 .ToList();
-#else
-            var tabs = this.Items.OfType<object>().Select(x => this.ItemContainerGenerator.ContainerFromItem(x)).OfType<RibbonTabItem>()
-                .Where(x => x.Visibility == Visibility.Visible && x.IsEnabled && (x.IsContextual == false || (x.IsContextual && x.Group.Visibility == Visibility.Visible)))
-                .OrderBy(x => x.IsContextual)
-                .ToList();
-#endif
 
             for (var i = 0; i < tabs.Count; i++)
             {
@@ -767,7 +752,7 @@ namespace Fluent
         }
 
         // Handles IsMinimized changed
-        private static void OnMinimizedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnIsMinimizedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var tab = (RibbonTabControl)d;
 

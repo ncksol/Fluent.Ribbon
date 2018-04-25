@@ -1,25 +1,52 @@
+REDIRECTS: OFF
 SPECIFIC-VERSION: FALSE
-RESTRICTION: || (== net40) (== net45) (== net462)
+RESTRICTION: || (== net45) (== net462)
 NUGET
-  remote: https://www.nuget.org/api/v2
-    7-Zip.CommandLine (16.4)
-    ControlzEx (3.0.1.66)
+  remote: https://api.nuget.org/v3/index.json
+    ControlzEx (3.0.2.4)
     gitlink (3.1)
-    MahApps.Metro (1.5)
-    NuGet.CommandLine (4.1)
-    NUnit (3.7.1)
-    NUnit.Console (3.7)
-      NUnit.ConsoleRunner (>= 3.7)
+    MSBuild.Sdk.Extras (1.3.1)
+    StyleCop.Analyzers (1.0.2)
+    WpfAnalyzers (2.1.2.1)
+    XamlColorSchemeGenerator (1.0.3.17)
+
+GROUP cake
+RESTRICTION: == net45
+NUGET
+  remote: https://api.nuget.org/v3/index.json
+    Cake (0.25)
+    Cake.Figlet (1.0)
+    Cake.Paket (2.0)
+    Cake.Paket.Module (2.0)
+    GitVersion.CommandLine (3.6.5)
+    NUnit.Console (3.8)
+      NUnit.ConsoleRunner (>= 3.8)
       NUnit.Extension.NUnitProjectLoader (>= 3.5)
       NUnit.Extension.NUnitV2Driver (>= 3.6)
       NUnit.Extension.NUnitV2ResultWriter (>= 3.5)
-      NUnit.Extension.TeamCityEventListener (>= 1.0.2)
-      NUnit.Extension.VSProjectLoader (>= 3.5)
-    NUnit.ConsoleRunner (3.7)
+      NUnit.Extension.TeamCityEventListener (>= 1.0.3)
+      NUnit.Extension.VSProjectLoader (>= 3.7)
+    NUnit.ConsoleRunner (3.8)
     NUnit.Extension.NUnitProjectLoader (3.6)
     NUnit.Extension.NUnitV2Driver (3.7)
     NUnit.Extension.NUnitV2ResultWriter (3.6)
-    NUnit.Extension.TeamCityEventListener (1.0.2)
-    NUnit.Extension.VSProjectLoader (3.6)
-    StyleCop.Analyzers (1.0.2)
-    XamlColorSchemeGenerator (1.0.1)
+    NUnit.Extension.TeamCityEventListener (1.0.3)
+    NUnit.Extension.VSProjectLoader (3.7)
+
+GROUP showcase
+REDIRECTS: OFF
+SPECIFIC-VERSION: FALSE
+RESTRICTION: || (== net45) (== net462)
+NUGET
+  remote: https://api.nuget.org/v3/index.json
+    ControlzEx (3.0.2.4)
+    MahApps.Metro (1.6.1)
+      ControlzEx (>= 3.0.2.4 < 4.0)
+
+GROUP test
+REDIRECTS: OFF
+SPECIFIC-VERSION: FALSE
+RESTRICTION: || (== net45) (== net462)
+NUGET
+  remote: https://api.nuget.org/v3/index.json
+    NUnit (3.10.1)

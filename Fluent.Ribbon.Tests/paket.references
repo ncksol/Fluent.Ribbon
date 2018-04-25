@@ -1,2 +1,4 @@
-NUnit
 StyleCop.Analyzers
+
+group test
+    NUnit

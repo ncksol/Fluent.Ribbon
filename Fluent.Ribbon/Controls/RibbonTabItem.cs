@@ -83,9 +83,7 @@ namespace Fluent
 
         #region KeyTip
 
-        /// <summary>
-        /// Gets or sets KeyTip for element.
-        /// </summary>
+        /// <inheritdoc />
         public string KeyTip
         {
             get { return (string)this.GetValue(KeyTipProperty); }
@@ -164,9 +162,7 @@ namespace Fluent
         /// </summary>
         public static readonly DependencyProperty IsContextualProperty = IsContextualPropertyKey.DependencyProperty;
 
-        /// <summary>
-        /// Gets an enumerator for logical child elements of this element.
-        /// </summary>
+        /// <inheritdoc />
         protected override IEnumerator LogicalChildren
         {
             get
@@ -204,13 +200,7 @@ namespace Fluent
         /// <summary>
         /// Gets ribbon tab control parent
         /// </summary>
-        internal RibbonTabControl TabControlParent
-        {
-            get
-            {
-                return ItemsControl.ItemsControlFromItemContainer(this) as RibbonTabControl;
-            }
-        }
+        internal RibbonTabControl TabControlParent => UIHelper.GetParent<RibbonTabControl>(this);
 
         /// <summary>
         /// Gets or sets indent
@@ -392,9 +382,7 @@ namespace Fluent
 
         #region Header Property
 
-        /// <summary>
-        /// Gets or sets header of tab item
-        /// </summary>
+        /// <inheritdoc />
         public object Header
         {
             get { return this.GetValue(HeaderProperty); }
@@ -599,9 +587,7 @@ namespace Fluent
 
         private bool SettingFocus { get; set; }
 
-        /// <summary>
-        /// Focus event handler
-        /// </summary>
+        /// <inheritdoc />
         protected override void OnPreviewGotKeyboardFocus(KeyboardFocusChangedEventArgs e)
         {
             base.OnPreviewGotKeyboardFocus(e);
@@ -650,11 +636,7 @@ namespace Fluent
             }
         }
 
-        /// <summary>
-        /// Called to remeasure a control.
-        /// </summary>
-        /// <param name="constraint">The maximum size that the method can return.</param>
-        /// <returns>The size of the control, up to the maximum specified by constraint.</returns>
+        /// <inheritdoc />
         protected override Size MeasureOverride(Size constraint)
         {
             if (this.contentContainer == null)
@@ -722,9 +704,7 @@ namespace Fluent
             return result;
         }
 
-        /// <summary>
-        /// On new style applying
-        /// </summary>
+        /// <inheritdoc />
         public override void OnApplyTemplate()
         {
             this.contentContainer = this.GetTemplateChild("PART_ContentContainer") as Border;
@@ -756,7 +736,7 @@ namespace Fluent
                     {
                         var newItem = this.TabControlParent.ItemContainerGenerator.ItemFromContainer(this);
 
-                        if (ReferenceEquals(this.TabControlParent.SelectedTabItem, newItem))
+                        if (ReferenceEquals(this.TabControlParent.SelectedItem, newItem))
                         {
                             this.TabControlParent.IsDropDownOpen = !this.TabControlParent.IsDropDownOpen;
                         }
@@ -790,10 +770,10 @@ namespace Fluent
             var newValue = (bool)e.NewValue;
             if (newValue)
             {
-                if (container.TabControlParent?.SelectedItem is RibbonTabItem
-                    && ReferenceEquals(container.TabControlParent.SelectedItem, container) == false)
+                if (container.TabControlParent?.SelectedTabItem != null
+                    && ReferenceEquals(container.TabControlParent.SelectedTabItem, container) == false)
                 {
-                    ((RibbonTabItem)container.TabControlParent.SelectedItem).IsSelected = false;
+                    container.TabControlParent.SelectedTabItem.IsSelected = false;
                 }
 
                 container.OnSelected(new RoutedEventArgs(Selector.SelectedEvent, container));

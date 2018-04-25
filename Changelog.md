@@ -1,5 +1,66 @@
 # Changelog for Fluent.Ribbon
 
+## 7.0.0 (preview)
+- ### Breaking changes
+  - [#471](../../issues/471) - **Drop support for .Net 4.0**
+  - [#515](../../issues/515) - Switch to new csproj format and require VS2017 for development
+  - [#545](../../issues/545) - SplitButton.IsChecked is not bound 2 way by default
+  - Due to [#549](../../issues/549) `RibbonGroupBox.Header` is now of type object and `RibbonGroupBox` now inherits from `HeaderedItemsControl` instead of `ItemsControl`.  
+  Please have a look at the [documentation](http://fluentribbon.github.io/documentation/controls/ribbon-group-box#customizingHeader) for details.
+  - Removed `CornerRadius` on `Button`.
+  - Default `Foreground` for `ComboBox` is now `Fluent.Ribbon.Brushes.LabelTextBrush`.
+  - Key tips can not be opened by pressing `Space`.
+  - The following resources were added, renamed or removed ("---" indicates added when in column "Old" and removed when in column "Old"):
+
+<details><summary>Click here to show the list of renamed and removed things</summary><p>
+
+|Old|New|
+|---|---|
+| BackstageButtonStyle | Fluent.Ribbon.Styles.BackstageTabControl.Button |
+| BackstageButtonControlTemplate | Fluent.Ribbon.Templates.BackstageTabControl.Button |
+| BackstageSeparatorTabItemStyle | Fluent.Ribbon.Styles.BackstageTabControl.SeparatorTabItem |
+| ComboBoxBackstageStyle | Fluent.Ribbon.Styles.Backstage.ComboBox |
+| ComboBoxItemBackstageControlTemplate | --- |
+| MetroComboBoxItemBackstageStyle | --- |
+| ComboBoxBackstageControlTemplate | --- |
+| ButtonBackstageStyle | Fluent.Ribbon.Styles.Backstage.Button |
+| ButtonBackstageControlTemplate | --- |
+| ToggleButtonBackstageStyle | Fluent.Ribbon.Styles.Backstage.ToggleButton |
+| ToggleButtonBackstageControlTemplate | --- |
+| DropDownButtonBackstageStyle | Fluent.Ribbon.Styles.Backstage.DropDownButton |
+| DropDownButtonBackstageControlTemplate | --- |
+| --- | Fluent.Ribbon.Brushes.TextBox.CaretBrush |
+| --- | Fluent.Ribbon.Brushes.TextBox.SelectionBrush |
+| DialogLauncherButtonKeyTipKeysProperty | LauncherKeysProperty |
+| OnCanAddToQuickAccessToolbarChanged | OnCanAddToQuickAccessToolBarChanged |
+</p></details>
+
+- ### Bug fixes
+  - [#535](../../issues/535) - BorderBush on bottom of RibbonTabItem (and Ribbon)
+  - [#536](../../issues/536) - RibbonContextualTabGroup header text trimmed until hovered
+  - [#542](../../issues/542) - InRibbonGallery not reducing properly
+  - [#543](../../issues/543) - Using images that can't be found during design time crashes designer  
+  A generic "error" image is rendered during design time and an exception is thrown during runtime.
+  - [#551](../../issues/551) - "Auto" size for ribbon group box header to support custom font sizes (thanks @chrfin)
+  - [#552](../../issues/552) - RibbonGroupBox should resize when font family or size are changed
+  - [#562](../../issues/562) - Pressing "right" arrow key to open submenu on menuitem causes NullRef exception when there is no submenu
+  - [#564](../../issues/564) - Gallery overflow panel (with menu items) doesn't close when clicking once in the application
+
+- ### Enhancements
+  - [#516](../../issues/516) - Add options to hide the row containing RibbonTabItems  
+    You can achieve this by:
+    - Setting `Ribbon.Menu` to `null` (or never assigning anything)
+    - Setting `Ribbon.CanMinimize` to `false`
+    - Setting `Ribbon.AreTabHeadersVisible` to `false`
+    - Setting `Ribbon.IsToolBarVisible` to `false`
+  - [#533](../../issues/533) - Issue when using templated ribbon items
+  - [#544](../../issues/544) - Add proper DPI support for icons/images aquired through ObjectToImageConverter on .NET 4.6.2
+  - [#549](../../issues/549) - Implement RibbonGroupBox header template
+  - [#553](../../issues/553) - Introduce resources for CaretBrush and SelectionBrush for TextBox
+  - [#554](../../issues/554) - No Keytips on templated ribbon items.
+  - [#563](../../issues/563) - Add customizable keys for activating the key tips. (thanks @pschimmel)  
+  You can now set your own keys for showing key tips. Have a look at `Ribbon.KeyTipKeys`.
+
 ## 6.1.0
 
 - ### Bug fixes
@@ -36,7 +97,7 @@
   - There are a lot new resources to control the colorization. Please have a look at Colors.xaml for a list of all available resources.  
     This also means that, for example, simply changing the foreground/background of one outer control won't change the foreground/background of all inner controls.
   - [#457](../../issues/457) - Return type of `IKeyTipedControl.OnKeyTipPressed` was changed from `void` to `KeyTipPressedResult`.
-  - The following `Color` and `Brush` resources got replaced/renamed/removed:
+  - The following `Color` and `Brush` resources were replaced/renamed/removed ("---" indicates removed):
 
 <details><summary>Click here to show the list of replaced/renamed/removed things</summary><p>
 

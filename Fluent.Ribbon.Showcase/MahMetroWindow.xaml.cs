@@ -1,6 +1,7 @@
 ﻿namespace FluentTest
 {
     using System;
+    using System.Linq;
     using System.Windows;
     using Fluent;
     using MahApps.Metro.Controls;
@@ -23,6 +24,19 @@
             this.TitleBar = this.FindChild<RibbonTitleBar>("RibbonTitleBar");
             this.TitleBar.InvalidateArrange();
             this.TitleBar.UpdateLayout();
+
+            this.SyncThemeManagers();
+
+            ThemeManager.IsThemeChanged += (o, args) => this.SyncThemeManagers();
+        }
+
+        private void SyncThemeManagers()
+        {
+            // Sync Fluent and MahApps ThemeManager
+            var fluentAppStyle = ThemeManager.DetectAppStyle();
+            var appTheme = MahApps.Metro.ThemeManager.AppThemes.First(x => x.Name == fluentAppStyle.Item1.Name);
+            var accent = MahApps.Metro.ThemeManager.Accents.First(x => x.Name == fluentAppStyle.Item2.Name);
+            MahApps.Metro.ThemeManager.ChangeAppStyle(this, accent, appTheme);
         }
 
         #region TitelBar
@@ -33,15 +47,16 @@
         public RibbonTitleBar TitleBar
         {
             get { return (RibbonTitleBar)this.GetValue(TitleBarProperty); }
-            private set { this.SetValue(titleBarPropertyKey, value); }
+            private set { this.SetValue(TitleBarPropertyKey, value); }
         }
 
-        private static readonly DependencyPropertyKey titleBarPropertyKey = DependencyProperty.RegisterReadOnly(nameof(TitleBar), typeof(RibbonTitleBar), typeof(MahMetroWindow), new PropertyMetadata());
+        // ReSharper disable once InconsistentNaming
+        private static readonly DependencyPropertyKey TitleBarPropertyKey = DependencyProperty.RegisterReadOnly(nameof(TitleBar), typeof(RibbonTitleBar), typeof(MahMetroWindow), new PropertyMetadata());
 
         /// <summary>
         /// <see cref="DependencyProperty"/> for <see cref="TitleBar"/>.
         /// </summary>
-        public static readonly DependencyProperty TitleBarProperty = titleBarPropertyKey.DependencyProperty;
+        public static readonly DependencyProperty TitleBarProperty = TitleBarPropertyKey.DependencyProperty;
 
         #endregion
     }

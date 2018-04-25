@@ -46,14 +46,10 @@ namespace Fluent
         /// </summary>
         protected bool Disposed { get; private set; }
 
-        /// <summary>
-        /// Gets wether state is currently loading.
-        /// </summary>
+        /// <inheritdoc />
         public bool IsLoading { get; private set; }
 
-        /// <summary>
-        /// Gets or sets whether state is loaded.
-        /// </summary>
+        /// <inheritdoc />
         public bool IsLoaded { get; private set; }
 
         /// <summary>
@@ -93,18 +89,14 @@ namespace Fluent
             }
         }
 
-        /// <summary>
-        /// Save current state to a temporary storage.
-        /// </summary>
+        /// <inheritdoc />
         public virtual void SaveTemporary()
         {
             this.memoryStream.Position = 0;
             this.Save(this.memoryStream);
         }
 
-        /// <summary>
-        /// Save current state to a persistent storage.
-        /// </summary>
+        /// <inheritdoc />
         public virtual void Save()
         {
             // Check whether automatic save is valid now
@@ -178,11 +170,10 @@ namespace Fluent
             // Foreach items and see whether path is found for the item
             foreach (var element in this.ribbon.GetQuickAccessElements())
             {
-                string path;
                 var control = element.Key as FrameworkElement;
 
                 if (control != null
-                    && paths.TryGetValue(control, out path))
+                    && paths.TryGetValue(control, out var path))
                 {
                     builder.Append(path);
                     builder.Append(';');
@@ -202,21 +193,14 @@ namespace Fluent
             return builder;
         }
 
-        /// <summary>
-        /// Load state from a temporary storage.
-        /// </summary>
+        /// <inheritdoc />
         public virtual void LoadTemporary()
         {
             this.memoryStream.Position = 0;
             this.Load(this.memoryStream);
         }
 
-        /// <summary>
-        /// Loads the State from Isolated Storage (in user store for domain)
-        /// </summary>
-        /// <remarks>
-        /// Sets <see cref="IsLoaded" /> after it's finished to prevent a race condition with saving the state to the MemoryStream.
-        /// </remarks>
+        /// <inheritdoc />
         public virtual void Load()
         {
             // Don't save or load state in design mode
@@ -421,7 +405,7 @@ namespace Fluent
             }
         }
 
-        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+        /// <inheritdoc />
         public void Dispose()
         {
             this.Dispose(true);

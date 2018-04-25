@@ -1,2 +1,4 @@
-MahApps.Metro
 StyleCop.Analyzers
+
+group showcase
+    MahApps.Metro

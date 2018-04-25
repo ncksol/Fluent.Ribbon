@@ -114,6 +114,7 @@ namespace Fluent
                 var groupBox = child as RibbonGroupBox;
 
                 var keys = KeyTip.GetKeys(child);
+
                 if (keys != null)
                 {
                     if (groupBox != null)
@@ -147,9 +148,8 @@ namespace Fluent
         private void GenerateAndAddRegularKeyTipInformations(string keys, FrameworkElement child, bool hide)
         {
             IEnumerable<KeyTipInformation> informations;
-            var keyTipInformationProvider = child as IKeyTipInformationProvider;
 
-            if (keyTipInformationProvider != null)
+            if (child is IKeyTipInformationProvider keyTipInformationProvider)
             {
                 informations = keyTipInformationProvider.GetKeyTipInformations(hide);
             }
@@ -180,7 +180,7 @@ namespace Fluent
 
             var children = logicalChildren;
 
-            // Always using the visual tree is very expensive, so we only search through it when you got specific control types.
+            // Always using the visual tree is very expensive, so we only search through it when we got specific control types.
             // Using the visual tree here, in addition to the logical, partially fixes #244.
             if (element is ContentPresenter
                 || element is ContentControl)
@@ -188,6 +188,10 @@ namespace Fluent
                 children = children
                     .Concat(UIHelper.GetVisualChildren(element))
                     .OfType<FrameworkElement>();
+            }
+            else if (element is ItemsControl itemsControl)
+            {
+                children = children.Concat(UIHelper.GetAllItemContainers<FrameworkElement>(itemsControl));
             }
 
             return children
@@ -396,7 +400,7 @@ namespace Fluent
             this.LogTrace("Forwarding keys \"{0}\" to element \"{1}\".", keys, GetControlLogText(element));
 
             this.Detach();
-            KeyTipPressedResult keyTipPressedResult = KeyTipPressedResult.Empty;
+            var keyTipPressedResult = KeyTipPressedResult.Empty;
 
             if (click)
             {
@@ -503,14 +507,7 @@ namespace Fluent
 
         #region Layout & Visual Children
 
-        /// <summary>
-        /// Positions child elements and determines
-        /// a size for the control
-        /// </summary>
-        /// <param name="finalSize">The final area within the parent
-        /// that this element should use to arrange
-        /// itself and its children</param>
-        /// <returns>The actual size used</returns>
+        /// <inheritdoc />
         protected override Size ArrangeOverride(Size finalSize)
         {
             this.LogDebug("ArrangeOverride");
@@ -523,13 +520,7 @@ namespace Fluent
             return finalSize;
         }
 
-        /// <summary>
-        /// Measures KeyTips
-        /// </summary>
-        /// <param name="constraint">The available size that this element can give to child elements.</param>
-        /// <returns>The size that the groups container determines it needs during
-        /// layout, based on its calculations of child element sizes.
-        /// </returns>
+        /// <inheritdoc />
         protected override Size MeasureOverride(Size constraint)
         {
             this.LogDebug("MeasureOverride");
@@ -804,16 +795,10 @@ namespace Fluent
             return UIHelper.GetParent<QuickAccessToolBar>(element) != null;
         }
 
-        /// <summary>
-        /// Gets visual children count
-        /// </summary>
+        /// <inheritdoc />
         protected override int VisualChildrenCount => this.keyTipInformations.Count;
 
-        /// <summary>
-        /// Returns a child at the specified index from a collection of child elements
-        /// </summary>
-        /// <param name="index">The zero-based index of the requested child element in the collection</param>
-        /// <returns>The requested child element</returns>
+        /// <inheritdoc />
         protected override Visual GetVisualChild(int index)
         {
             return this.keyTipInformations[index].KeyTip;

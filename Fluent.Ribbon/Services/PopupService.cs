@@ -31,15 +31,6 @@ namespace Fluent
     /// </summary>
     public class DismissPopupEventArgs : RoutedEventArgs
     {
-        #region Properties
-
-        /// <summary>
-        /// Popup dismiss mode
-        /// </summary>
-        public DismissPopupMode DismissMode { get; set; }
-
-        #endregion
-
         /// <summary>
         /// Standard constructor
         /// </summary>
@@ -59,9 +50,11 @@ namespace Fluent
         }
 
         /// <summary>
-        /// When overridden in a derived class, provides a way to invoke event handlers in a type-specific way, which can increase efficiency over the base implementation.
+        /// Popup dismiss mode
         /// </summary>
-        /// <param name="genericHandler">The generic handler / delegate implementation to be invoked.</param><param name="genericTarget">The target on which the provided handler should be invoked.</param>
+        public DismissPopupMode DismissMode { get; set; }
+
+        /// <inheritdoc />
         protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget)
         {
             var handler = (EventHandler<DismissPopupEventArgs>)genericHandler;
@@ -144,7 +137,24 @@ namespace Fluent
                     // Special handling for unknown Popups (for example datepickers used in the ribbon)
                     || (sender is IDropDownControl && IsPopupRoot(Mouse.Captured)))
                 {
-                    RaiseDismissPopupEvent(sender, DismissPopupMode.MouseNotOver);
+                    if (sender is RibbonTabControl ribbonTabControl
+                        && ribbonTabControl.IsMinimized
+                        // this is true if, for example, a DatePicker popup is open and we click outside of the ribbon popup
+                        // this should then only close the DatePicker popup but not the ribbon popup
+                        && IsPopupRoot(e.OriginalSource) == false)
+                    {
+                        // Don't close the ribbon popup if the mouse is over the ribbon popup
+                        if (IsMousePhysicallyOver(ribbonTabControl.SelectedContentPresenter) == false)
+                        {
+                            // Force dismissing the Ribbon-Popup.
+                            // Always is needed because of eager-closing-prevention.
+                            RaiseDismissPopupEvent(sender, DismissPopupMode.Always);
+                        }
+                    }
+                    else
+                    {
+                        RaiseDismissPopupEvent(sender, DismissPopupMode.MouseNotOver);
+                    }
                 }
             }
         }
@@ -195,6 +205,8 @@ namespace Fluent
                     return;
                 }
 
+                // This code is needed to keep some popus open.
+                // One of these is the ribbon popup when it's minimized.
                 if (e.OriginalSource != null
                     && Mouse.Captured == null
                     && (IsPopupRoot(e.OriginalSource) || IsAncestorOf(popup.Child, e.OriginalSource as DependencyObject)))
@@ -202,6 +214,13 @@ namespace Fluent
                     Debug.WriteLine($"Setting mouse capture to: {sender}");
                     Mouse.Capture(sender as IInputElement, CaptureMode.SubTree);
                     e.Handled = true;
+
+                    // Only raise a popup dismiss event if the source is MenuBase.
+                    // this is because MenuBase "steals" the mouse focus in a way we have to work around here.
+                    if (e.OriginalSource is MenuBase)
+                    {
+                        RaiseDismissPopupEvent(sender, DismissPopupMode.MouseNotOver);
+                    }
                 }
             }
         }
@@ -248,10 +267,19 @@ namespace Fluent
 
                 control.IsDropDownOpen = false;
             }
-            else
+            else if (control.IsDropDownOpen)
             {
-                if (control.IsDropDownOpen
-                    && !IsMousePhysicallyOver(control.DropDownPopup))
+                // Prevent eager closing of the Ribbon-Popup and forward mouse focus to the ribbon popup instead.
+                if (control is RibbonTabControl ribbonTabControl
+                    && ribbonTabControl.IsMinimized
+                    && IsAncestorOf(control as DependencyObject, e.OriginalSource as DependencyObject))
+                {
+                    Mouse.Capture(control as IInputElement, CaptureMode.SubTree);
+
+                    return;
+                }
+
+                if (IsMousePhysicallyOver(control.DropDownPopup.Child) == false)
                 {
                     if (Mouse.Captured == control)
                     {
@@ -262,16 +290,12 @@ namespace Fluent
                 }
                 else
                 {
-                    if (control.IsDropDownOpen
-                        && Mouse.Captured != control)
+                    if (Mouse.Captured != control)
                     {
                         Mouse.Capture(sender as IInputElement, CaptureMode.SubTree);
                     }
 
-                    if (control.IsDropDownOpen)
-                    {
-                        e.Handled = true;
-                    }
+                    e.Handled = true;
                 }
             }
         }
@@ -315,9 +339,7 @@ namespace Fluent
         /// </summary>
         public static void OnContextMenuOpened(object sender, ContextMenuEventArgs e)
         {
-            var control = sender as IDropDownControl;
-
-            if (control != null)
+            if (sender is IDropDownControl control)
             {
                 control.IsContextMenuOpened = true;
                 // Debug.WriteLine("Context menu opened");
@@ -329,9 +351,7 @@ namespace Fluent
         /// </summary>
         public static void OnContextMenuClosed(object sender, ContextMenuEventArgs e)
         {
-            var control = sender as IDropDownControl;
-
-            if (control != null)
+            if (sender is IDropDownControl control)
             {
                 //Debug.WriteLine("Context menu closed");
                 control.IsContextMenuOpened = false;

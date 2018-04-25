@@ -5,7 +5,6 @@ namespace Fluent
     using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Data;
@@ -32,10 +31,15 @@ namespace Fluent
         /// </summary>
         public event DependencyPropertyChangedEventHandler IsOpenChanged;
 
-        // Adorner for backstage
         private BackstageAdorner adorner;
 
         #region Properties
+
+        /// <summary>
+        /// Gets the <see cref="AdornerLayer"/> for the <see cref="Backstage"/>.
+        /// </summary>
+        /// <remarks>This is exposed to make it possible to show content on the same <see cref="AdornerLayer"/> as the backstage is shown on.</remarks>
+        public AdornerLayer AdornerLayer { get; private set; }
 
         /// <summary>
         /// Gets or sets whether backstage is shown
@@ -51,7 +55,7 @@ namespace Fluent
         /// This enables animation, styling, binding, etc...
         /// </summary>
         public static readonly DependencyProperty IsOpenProperty =
-            DependencyProperty.Register(nameof(IsOpen), typeof(bool), typeof(Backstage), new PropertyMetadata(BooleanBoxes.FalseBox, OnIsOpenChanged, OnCoerceIsOpen));
+            DependencyProperty.Register(nameof(IsOpen), typeof(bool), typeof(Backstage), new PropertyMetadata(BooleanBoxes.FalseBox, OnIsOpenChanged, CoerceIsOpen));
 
         /// <summary>
         /// Gets or sets whether backstage can be openend or closed.
@@ -131,7 +135,7 @@ namespace Fluent
         public static readonly DependencyProperty CloseOnEscProperty =
             DependencyProperty.Register(nameof(CloseOnEsc), typeof(bool), typeof(Backstage), new PropertyMetadata(BooleanBoxes.TrueBox));
 
-        private static object OnCoerceIsOpen(DependencyObject d, object baseValue)
+        private static object CoerceIsOpen(DependencyObject d, object baseValue)
         {
             var backstage = (Backstage)d;
 
@@ -159,15 +163,9 @@ namespace Fluent
                     {
                         var timespan = backstage.HideAnimationDuration.TimeSpan;
 
-#if NET40
-                        Task.Factory.StartNew(() =>
-                        {
-                            Thread.Sleep(timespan);
-#else
                         Task.Factory.StartNew(async () =>
                         {
                             await Task.Delay(timespan);
-#endif
 
                             backstage.Dispatcher.RunInDispatcher(backstage.Hide);
                         });
@@ -206,9 +204,7 @@ namespace Fluent
             var backstage = (Backstage)d;
             if (e.OldValue != null)
             {
-                var dependencyObject = e.NewValue as DependencyObject;
-
-                if (dependencyObject != null)
+                if (e.NewValue is DependencyObject dependencyObject)
                 {
                     BindingOperations.ClearBinding(dependencyObject, VisibilityProperty);
                 }
@@ -220,9 +216,7 @@ namespace Fluent
             {
                 backstage.AddLogicalChild(e.NewValue);
 
-                var dependencyObject = e.NewValue as DependencyObject;
-
-                if (dependencyObject != null)
+                if (e.NewValue is DependencyObject dependencyObject)
                 {
                     BindingOperations.SetBinding(dependencyObject, VisibilityProperty, new Binding { Path = new PropertyPath(VisibilityProperty), Source = backstage });
                 }
@@ -233,9 +227,7 @@ namespace Fluent
 
         #region LogicalChildren
 
-        /// <summary>
-        /// Gets an enumerator for logical child elements of this element.
-        /// </summary>
+        /// <inheritdoc />
         protected override IEnumerator LogicalChildren
         {
             get
@@ -460,9 +452,9 @@ namespace Fluent
                 elementToAdorn = currentAdornerDecorator;
             }
 
-            var layer = UIHelper.GetAdornerLayer(elementToAdorn);
+            this.AdornerLayer = UIHelper.GetAdornerLayer(elementToAdorn);
 
-            if (layer == null)
+            if (this.AdornerLayer == null)
             {
                 throw new Exception($"AdornerLayer could not be found for {this}.");
             }
@@ -472,9 +464,9 @@ namespace Fluent
                                DataContext = this.DataContext
                            };
 
-            layer.Add(this.adorner);
+            this.AdornerLayer.Add(this.adorner);
 
-            layer.CommandBindings.Add(new CommandBinding(RibbonCommands.OpenBackstage, HandleOpenBackstageCommandExecuted, HandleOpenBackstageCommandCanExecute));
+            this.AdornerLayer.CommandBindings.Add(new CommandBinding(RibbonCommands.OpenBackstage, HandleOpenBackstageCommandExecuted, HandleOpenBackstageCommandCanExecute));
         }
 
         private static void HandleOpenBackstageCommandCanExecute(object sender, CanExecuteRoutedEventArgs args)
@@ -491,19 +483,18 @@ namespace Fluent
 
         private void DestroyAdorner()
         {
-            if (this.adorner == null)
+            this.AdornerLayer?.CommandBindings.Clear();
+            this.AdornerLayer?.Remove(this.adorner);
+
+            if (this.adorner != null)
             {
-                return;
+                this.adorner.DataContext = null;
             }
 
-            var layer = AdornerLayer.GetAdornerLayer(this.adorner);
-            layer?.CommandBindings.Clear();
-            layer?.Remove(this.adorner);
-
-            this.adorner.DataContext = null;
-
-            this.adorner.Clear();
+            this.adorner?.Clear();
             this.adorner = null;
+
+            this.AdornerLayer = null;
         }
 
         private void OnDelayedShow(object sender, EventArgs args)
@@ -640,15 +631,13 @@ namespace Fluent
                 return;
             }
 
-            var frameworkElement = parent as FrameworkElement;
-
             // Do not hide contents in the backstage area
             if (parent is BackstageAdorner)
             {
                 return;
             }
 
-            if (frameworkElement != null)
+            if (parent is FrameworkElement frameworkElement)
             {
                 if (parent is HwndHost
                     && frameworkElement.Visibility != Visibility.Collapsed)
@@ -666,10 +655,7 @@ namespace Fluent
             }
         }
 
-        /// <summary>
-        /// Invoked when an unhandled <see cref="E:System.Windows.Input.Keyboard.KeyDown"/> attached event reaches an element in its route that is derived from this class. Implement this method to add class handling for this event.
-        /// </summary>
-        /// <param name="e">The <see cref="T:System.Windows.Input.KeyEventArgs"/> that contains the event data.</param>
+        /// <inheritdoc />
         protected override void OnKeyDown(KeyEventArgs e)
         {
             if (e.Handled)
@@ -723,12 +709,7 @@ namespace Fluent
 
         #region Overrides
 
-        /// <summary>
-        /// Invoked when an unhandled System.Windows.UIElement.PreviewMouseLeftButtonDown routed event reaches an element
-        /// in its route that is derived from this class. Implement this method to add class handling for this event.
-        /// </summary>
-        /// <param name="e">The System.Windows.Input.MouseButtonEventArgs that contains the event data.
-        ///  The event data reports that the left mouse button was pressed.</param>
+        /// <inheritdoc />
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnMouseLeftButtonDown(e);
@@ -757,9 +738,7 @@ namespace Fluent
             base.OnKeyTipBack();
         }
 
-        /// <summary>
-        /// When overridden in a derived class, is invoked whenever application code or internal processes call <see cref="M:System.Windows.FrameworkElement.ApplyTemplate"/>.
-        /// </summary>
+        /// <inheritdoc />
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
@@ -781,12 +760,7 @@ namespace Fluent
 
         #region Quick Access Toolbar
 
-        /// <summary>
-        /// Gets control which represents shortcut item.
-        /// This item MUST be syncronized with the original
-        /// and send command to original one control.
-        /// </summary>
-        /// <returns>Control which represents shortcut item</returns>
+        /// <inheritdoc />
         public override FrameworkElement CreateQuickAccessItem()
         {
             throw new NotImplementedException();

@@ -27,9 +27,7 @@ namespace Fluent
 
         #region Properties
 
-#if NET45 || NET462
         private object currentItem;
-#endif
 
         #endregion
 
@@ -69,13 +67,9 @@ namespace Fluent
 
         #region Overrides
 
-        /// <summary>
-        /// Creates or identifies the element that is used to display the given item.
-        /// </summary>
-        /// <returns>The element that is used to display the given item.</returns>
+        /// <inheritdoc />
         protected override DependencyObject GetContainerForItemOverride()
         {
-#if NET45 || NET462
             var item = this.currentItem;
             this.currentItem = null;
 
@@ -95,25 +89,19 @@ namespace Fluent
                     throw new InvalidOperationException("Invalid ItemContainer");
                 }
             }
-#endif
+
             return new StatusBarItem();
         }
 
-        /// <summary>
-        /// Determines if the specified item is (or is eligible to be) its own container.
-        /// </summary>
-        /// <param name="item">The item to check.</param>
-        /// <returns>true if the item is (or is eligible to be) its own container; otherwise, false.</returns>
+        /// <inheritdoc />
         protected override bool IsItemItsOwnContainerOverride(object item)
         {
             var isItemItsOwnContainerOverride = item is StatusBarItem || item is Separator;
 
-#if NET45 || NET462
             if (isItemItsOwnContainerOverride == false)
             {
                 this.currentItem = item;
             }
-#endif
 
             return isItemItsOwnContainerOverride;
         }
@@ -128,10 +116,7 @@ namespace Fluent
             this.RunInDispatcherAsync(this.RecreateMenu, DispatcherPriority.Loaded);
         }
 
-        /// <summary>
-        /// Invoked when the <see cref="P:System.Windows.Controls.ItemsControl.Items"/> property changes.
-        /// </summary>
-        /// <param name="e">Information about the change.</param>
+        /// <inheritdoc />
         protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
         {
             base.OnItemsChanged(e);
